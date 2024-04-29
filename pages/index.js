@@ -13,7 +13,8 @@ import {
   Text,
   ResponsiveContext,
   Stack,
-  DataTable
+  DataTable,
+  Layer
 } from "grommet";
 
 import { AddCircle } from 'grommet-icons';
@@ -22,12 +23,12 @@ import React, { useContext, useState } from "react";
 
 export default function Home() {
 
-  const [listOptions, setListOptions] = useState(['Frontend', 'BackEnd', 'React', 'Node']) //Use to store the list of keywords that can be scraped
+  const [listOptions, setListOptions] = useState(['Frontend', 'Backend', 'React', 'Node']) //Use to store the list of keywords that can be scraped
   const [listValues, setListValues] = useState(listOptions) //Stores the selected options from the list that are sent to api for scraping
   const [textInputValue, setTextInputValue] = useState('') //Controlled form text input to add keywords to the listOptions state
-  const [disableButton, setDisableButton] = useState(false) //Boolean to disable button as data fetch takes a long time - don't want multiple sends
   const [chartData, setChartData] = useState() //Storing the data that is returned from server used to plot chart
   const [timeToFetch, setTimeToFetch] = useState(0) //How long the fetch function takes to get data
+  const [isLoading, setIsLoading] = useState(false) //Stores if loading data, to display Layer over the top. Also controls if button is disabled or not.
 
   const size = useContext(ResponsiveContext); //size is small, medium or large depending on screen width
 
@@ -45,7 +46,7 @@ export default function Home() {
   }
 
   const scrapeButtonPress = () => { //Function to send listValues that are selected to api for data then process into chartData
-    setDisableButton(true)
+    setIsLoading(true)
     const startTime = performance.now()
     let endTime
     const bodyData = {titles: listValues}
@@ -61,7 +62,7 @@ export default function Home() {
       })
       .catch(error => console.log(error))
       .finally(() => {
-        setDisableButton(false)
+        setIsLoading(false)
         endTime = performance.now()
         setTimeToFetch(endTime - startTime)
       })
@@ -170,8 +171,8 @@ export default function Home() {
             </Stack>
             <Box pad={{top: "small"}}>
             <Button 
-              primary label={disableButton ? "Scrapping..." : "Scrape Data"}
-              disabled={disableButton}
+              primary label={isLoading ? "Scrapping..." : "Scrape Data"}
+              disabled={isLoading}
               onClick={scrapeButtonPress}
             />
             </Box>
