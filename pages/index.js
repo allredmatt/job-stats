@@ -21,6 +21,8 @@ import { AddCircle } from 'grommet-icons';
 
 import React, { useContext, useState } from "react";
 
+import postData from "../src/serverCall";
+
 export default function Home() {
 
   const [listOptions, setListOptions] = useState(['Frontend', 'Backend', 'React', 'Node']) //Use to store the list of keywords that can be scraped
@@ -49,8 +51,7 @@ export default function Home() {
     setIsLoading(true)
     const startTime = performance.now()
     let endTime
-    const bodyData = {titles: listValues}
-    postData('/api/jobstats', bodyData)
+    postData(listValues)
       .then(returnedData => {
         setChartData({
           total: returnedData.total,
@@ -201,15 +202,4 @@ export default function Home() {
       </Box>
     </Box>
   );
-}
-
-async function postData(url = '', data = {}) { //Generic function for sending POST JSON data via fetch (too small for own file?)
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  });
-  return response.json();
 }
